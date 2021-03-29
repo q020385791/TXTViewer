@@ -82,7 +82,7 @@ namespace SchemaSearch
             this.Controls.Add(this.txtSearch);
             this.Controls.Add(this.treeView1);
             this.Name = "Form1";
-            this.Text = "SQLFileViewer";
+            this.Text = "TXTFileViewer";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
