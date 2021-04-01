@@ -54,7 +54,7 @@ namespace SchemaSearch
         public void GetTreeViewByText(string SearchText) 
         {
             treeView1.Nodes.Clear();
-            string[] FilesName = Directory.GetFiles(SourceConcatTableScript);
+            string[] FilesName = Directory.GetFiles(SourceConcatTableScript,"*",SearchOption.AllDirectories);
             Dictionary<string, List<string>> Dic = new Dictionary<string, List<string>>();
             foreach (string FullFilePath in FilesName)
             {
@@ -87,6 +87,75 @@ namespace SchemaSearch
                 }
                 treeView1.Nodes.Add(ParentNode);
             }
+        }
+
+        private void treeView1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            string SelectedText = treeView1.SelectedNode.Text;
+            if (SelectedText.Length<=3)
+            {
+                return;
+            }
+            string[] FilesName = Directory.GetFiles(SourceConcatTableScript,"*",SearchOption.AllDirectories);
+            
+            string TargetPath = FilesName.Where(x=>x.Contains(SelectedText)).FirstOrDefault() ;
+            if (File.Exists(TargetPath))
+            {
+                Encoding unicode = Encoding.GetEncoding(950);
+                try
+                {
+                    if (SelectedText != null&& SelectedText!="")
+                    {
+                   
+                        TabPage tp = new TabPage(SelectedText);
+                        tp.Name = SelectedText;
+
+                        if (!tabControl.TabPages.ContainsKey(SelectedText))
+                        {
+                            tp.Name = SelectedText;
+                            tabControl.TabPages.Add(tp);
+                            TextBox tb = new TextBox();
+                            tb.Multiline = true;
+                            tb.Dock = DockStyle.Fill;
+                            tb.BackColor = Color.Black;
+                            tb.ForeColor = Color.White;
+                            tp.Controls.Add(tb);
+                            tb.Text = File.ReadAllText(TargetPath, unicode);
+                            tabControl.SelectedTab = tp;
+                        }
+                        else 
+                        {
+                            tabControl.SelectedTab = tabControl.TabPages[SelectedText];
+                        }
+
+
+                    }
+                   
+
+                   
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("無法讀取:" + TargetPath + "請確認檔案" + Environment.NewLine + ex.InnerException);
+                }
+            }
+        }
+
+        private TabPage savedTabPage;
+        private int savedTabPageIndex;
+        private void TSMIClose_Click(object sender, EventArgs e)
+        {
+            if (tabControl.TabPages.Count == 0 || tabControl.SelectedTab == null) return;
+            savedTabPage = tabControl.SelectedTab;
+            savedTabPageIndex = tabControl.TabPages.IndexOf(savedTabPage);
+            tabControl.TabPages.Remove(savedTabPage);
+        }
+
+        private void tabControl_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            SolidBrush BackBrush = new SolidBrush(Color.Blue);
+            Rectangle Rec = tabControl.GetTabRect(0);
+            e.Graphics.FillRectangle(BackBrush, Rec);
         }
     }
 }
